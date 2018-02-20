@@ -8,6 +8,7 @@ import org.cbioportal.model.FractionGenomeAltered;
 import org.cbioportal.model.GenePanelData;
 import org.cbioportal.model.MolecularData;
 import org.cbioportal.model.MrnaPercentile;
+import org.cbioportal.model.MutationCount;
 import org.cbioportal.model.MutationSpectrum;
 import org.cbioportal.model.Patient;
 import org.cbioportal.model.Sample;
@@ -26,7 +27,7 @@ import java.util.List;
 public class UniqueKeyInterceptor extends AbstractMappingJacksonResponseBodyAdvice {
 
     private static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder().withoutPadding();
-    private static final String DELIMITER = ":";
+    public static final String DELIMITER = ":";
 
     @Override
     protected void beforeBodyWriteInternal(MappingJacksonValue mappingJacksonValue, MediaType mediaType, 
@@ -91,6 +92,13 @@ public class UniqueKeyInterceptor extends AbstractMappingJacksonResponseBodyAdvi
                         mrnaPercentile.getStudyId()));
                     mrnaPercentile.setUniquePatientKey(calculateBase64(mrnaPercentile.getPatientId(), 
                         mrnaPercentile.getStudyId()));
+                } else if (object instanceof MutationCount) {
+                    
+                    MutationCount mutationCount = (MutationCount) object;
+                    mutationCount.setUniqueSampleKey(calculateBase64(mutationCount.getSampleId(), 
+                        mutationCount.getStudyId()));
+                    mutationCount.setUniquePatientKey(calculateBase64(mutationCount.getPatientId(), 
+                        mutationCount.getStudyId()));
                 } else if (object instanceof MutationSpectrum) {
                     
                     MutationSpectrum mutationSpectrum = (MutationSpectrum) object;

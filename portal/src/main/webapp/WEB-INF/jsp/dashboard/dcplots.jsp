@@ -97,9 +97,7 @@
         </div>
 
         <div id="iviz-header-right">
-            <div style="display: inline-flex">
-                <custom-case-input></custom-case-input>
-            </div>
+            <custom-case-input :stats="stats" :update-stats.sync="updateStats"></custom-case-input>
 
             <select id="iviz-add-chart" class="chosen-select"
                     v-select :charts="charts" v-if="showDropDown">
@@ -134,8 +132,7 @@
         </div>
     </div>
     <div :class="{'start-loading': showScreenLoad}" v-if="!failedToInit.status">
-        <div class="grid" id="main-grid"
-             :class="{loading:isloading}">
+        <div class="grid" id="main-grid" v-show="!isloading">
             <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
                            :selectedpatient-uIDs.sync="selectedpatientUIDs"
                            :selectedsample-uIDs.sync="selectedsampleUIDs"
@@ -144,6 +141,7 @@
                            :showed-survival-plot="showedSurvivalPlot"
                            :clear-all="clearAll"></main-template>
         </div>
+        <progress-bar div-id="study-view-summary-page-pb" :status="studyViewSummaryPagePBStatus" v-show="isloading"></progress-bar>
     </div>
     <error container-id="fail-to-init" v-if="failedToInit.status" :message="failedToInit.message"></error>
 </div>

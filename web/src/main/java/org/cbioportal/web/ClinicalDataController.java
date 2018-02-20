@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,8 +43,8 @@ import java.util.List;
 @Api(tags = "Clinical Data", description = " ")
 public class ClinicalDataController {
 
-    public static final int CLINICAL_DATA_MAX_PAGE_SIZE = 100000;
-    private static final String CLINICAL_DATA_DEFAULT_PAGE_SIZE = "100000";
+    public static final int CLINICAL_DATA_MAX_PAGE_SIZE = 10000000;
+    private static final String CLINICAL_DATA_DEFAULT_PAGE_SIZE = "10000000";
 
     @Autowired
     private ClinicalDataService clinicalDataService;

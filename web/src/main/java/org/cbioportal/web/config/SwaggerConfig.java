@@ -9,13 +9,16 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 
 @Configuration
 @EnableSwagger2
+@PropertySource("classpath:springfox.properties")
 public class SwaggerConfig {
 
     @Bean
@@ -49,7 +52,7 @@ public class SwaggerConfig {
             "http://www.cbioportal.org",
             new Contact("cBioPortal", "www.cbioportal.org", "cbioportal@googlegroups.com"),
             "License",
-            "https://github.com/cBioPortal/cbioportal/blob/master/LICENSE");
+            "https://github.com/cBioPortal/cbioportal/blob/master/LICENSE", Collections.emptyList());
         return apiInfo;
     }
 }

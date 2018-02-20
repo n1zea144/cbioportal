@@ -120,7 +120,7 @@ var tooltip_utils = {
 		popup.document.body.appendChild(div);
 		
 		$('<h3 style="text-align:center;">'+gene_panel_id+'</h3><br>').appendTo(div);
-		$(genes.join("<br>")).appendTo(div);
+		$('<span>'+genes.join("<br>")+'</span>').appendTo(div);
 	    });
 	}));
 	return anchor;
@@ -646,10 +646,15 @@ window.CreateCBioPortalOncoprintWithToolbar = function (ctr_selector, toolbar_se
 		}
 	    },
 	    'getInitUsedClinicalAttrs': function() {
-		if (init_clinical_attrs === null) {
+		var attrs = (init_clinical_attrs || "").trim().split(",").map(decodeURIComponent);
+		if (attrs.indexOf("CANCER_STUDY") === -1 &&
+			QuerySession.getCancerStudyIds().length > 1) {
+		    attrs.push("CANCER_STUDY");
+		}
+		if (!attrs.length) {
 		    return null;
 		} else {
-		    return init_clinical_attrs.trim().split(",").map(decodeURIComponent);
+		    return attrs;
 		}
 	    },
 	    'getInitHeatmapTrackGroups': function() {
@@ -1750,6 +1755,11 @@ window.CreateCBioPortalOncoprintWithToolbar = function (ctr_selector, toolbar_se
 	};
 
 	(function setUpHeatmap() {
+	    if (QuerySession.getCancerStudyIds().length > 1) {
+		// hide for multiple studies
+		$(toolbar_selector + ' #oncoprint_diagram_heatmap_menu').hide();
+		return;
+	    }
 	    QuerySession.getHeatmapProfiles().then(function (profiles) {
 		// Make a copy to modify here
 		profiles = utils.deepCopyObject(profiles);
@@ -2092,7 +2102,6 @@ window.CreateCBioPortalOncoprintWithToolbar = function (ctr_selector, toolbar_se
 		    var colorby_cbioportal_checkbox = $('#oncoprint_diagram_mutation_color').find('input[type="checkbox"][name="cbioportal"]');
 		    var colorby_cosmic_checkbox = $('#oncoprint_diagram_mutation_color').find('input[type="checkbox"][name="cosmic"]');
 		    var colorby_oncokb_checkbox = $('#oncoprint_diagram_mutation_color').find('input[type="checkbox"][name="oncokb"]');
-		    var colorby_binary_checkbox = $('#oncoprint_diagram_mutation_color').find('input[type="checkbox"][name="driver_filter"]');
 		    var colorby_binary_checkbox = $('#oncoprint_diagram_mutation_color').find('input[type="checkbox"][name="driver_filter"]');
 		    var colorby_multi_values_checkboxes = {};
 		    for (var value in getTiersMap()) {

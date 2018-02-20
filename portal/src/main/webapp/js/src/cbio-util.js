@@ -729,27 +729,11 @@ cbio.util = (function() {
 
     function getDatahubStudiesList() {
         var DATAHUB_GIT_URL =
-            'https://api.github.com/repos/cBioPortal/datahub/contents/public';
+            'proxy/download.cbioportal.org/study_list.json';
         var def = new $.Deferred();
 
         $.getJSON(DATAHUB_GIT_URL, function(data) {
-            var studies = {};
-            if (_.isArray(data)) {
-                _.each(data, function(fileInfo) {
-                    if (_.isObject(fileInfo) &&
-                        fileInfo.type === 'file' &&
-                        _.isString(fileInfo.name)) {
-                        var fileName = fileInfo.name.split('.tar.gz');
-                        if (fileName.length > 0) {
-                            studies[fileName[0]] = {
-                                name: fileName[0],
-                                htmlURL: fileInfo.html_url
-                            };
-                        }
-                    }
-                })
-            }
-            def.resolve(studies);
+            def.resolve(data);
         }).fail(function(error) {
             def.reject(error);
         });
@@ -810,6 +794,54 @@ cbio.util = (function() {
 
     }
 
+    /**
+     * Add cancer studies info within the combined study.
+     * 
+     * @param nameSelector - Any element selector can be accepted by jQuery
+     * @param descriptionSelector - Any element selector can be accepted by jQuery
+     * @param studies - List of cancer studies 
+     * @param name - The combined study name
+     * @param description - The combined study description
+     */
+    function showCombinedStudyNameAndDescription(nameSelector, descriptionSelector, studies, name, description) {
+        var hasStudies = _.isArray(studies) && studies.length > 0;
+        var twoMoreStudies = hasStudies && studies.length > 1;
+        name = name || (twoMoreStudies ? 'Combined Study' : 'Selected Study');
+        description = description || '';
+        $(nameSelector).append(name);
+        if (hasStudies) {
+            if (description) {
+                description += ' ';
+            }
+            description += twoMoreStudies ?
+                ('This combined study contains samples from ' + studies.length + ' studies.') : '';
+            var collapseStudyName = studies.map(function(study) {
+                // Remove html tags in study.description in case title of <a> not work 
+                return '<a href="' + window.cbioURL + 'study?id=' + study.id + '" title="' +
+                    study.description.replace(/(<([^>]+)>)/ig, '') + '" target="_blank">' +
+                    study.name + '</a>';
+            }).join("<br />");
+
+            if (twoMoreStudies) {
+                description += '<span class="truncated"><br />' + collapseStudyName + '</span>';
+            } else {
+                description += '<span>' + collapseStudyName + '</span>';
+            }
+        }
+        $(descriptionSelector).append(description);
+        if (hasStudies) {
+            if (twoMoreStudies) {
+                var trncatedElm = $('.truncated').hide()                       // Hide the text initially
+                    .before('<i class="fa fa-plus-circle combined-study-title-toggle-icon" aria-hidden="true"></i>'); /// Create toggle button
+                $(descriptionSelector).find('.combined-study-title-toggle-icon')
+                    .on('click', function() {          // Attach behavior
+                        $(this).toggleClass("fa-minus-circle");   // Swap the icon
+                        $(trncatedElm).toggle();                    // Hide/show the text
+                    });
+            }
+        }
+    }
+
     return {
         toPrecision: toPrecision,
         getObjectLength: getObjectLength,
@@ -838,6 +870,7 @@ cbio.util = (function() {
         deepCopyObject: deepCopyObject,
         makeCachedPromiseFunction: makeCachedPromiseFunction,
         getDatahubStudiesList: getDatahubStudiesList,
+        showCombinedStudyNameAndDescription: showCombinedStudyNameAndDescription,
         getDecimalExponents: getDecimalExponents
     };
 
