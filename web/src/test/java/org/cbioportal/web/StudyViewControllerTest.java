@@ -165,7 +165,7 @@ public class StudyViewControllerTest {
         mutationCounts.add(mutationCount2);
 
         Mockito.when(mutationService.getSampleCountByEntrezGeneIdsAndSampleIds(Mockito.anyString(), 
-            Mockito.anyListOf(String.class), Mockito.anyListOf(Integer.class), Mockito.anyBoolean())).thenReturn(mutationCounts);
+            Mockito.anyListOf(String.class), Mockito.anyListOf(Integer.class), Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(mutationCounts);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/molecular-profiles/test_molecular_profile_id/mutated-genes/fetch")
             .accept(MediaType.APPLICATION_JSON)

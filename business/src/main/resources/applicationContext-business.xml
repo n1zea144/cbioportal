@@ -26,6 +26,11 @@
         <!-- scan for mappers and let them be autowired -->
         <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
             <property name="basePackage" value="org.mskcc.cbio.portal.persistence,org.cbioportal.persistence.mybatis" />
+            <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+        </bean>
+        <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+            <property name="basePackage" value="org.cbioportal.persistence.neo4j" />
+            <property name="sqlSessionFactoryBeanName" value="neo4jSessionFactory" />
         </bean>
 
         <!-- these are required to get properly autowired mappers into our service classes -->
@@ -90,6 +95,16 @@
                 </bean>
             </property>
         </bean>
+        <bean id="neo4jSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+            <property name="dataSource" ref="neo4jDataSource" />
+            <property name="typeAliasesPackage" value="org.mskcc.cbio.portal.model" />
+            <property name="typeHandlersPackage" value="org.cbioportal.persistence.mybatis.typehandler" />
+            <property name="configuration">
+                <bean class="org.apache.ibatis.session.Configuration">
+                    <property name="cacheEnabled" value="${mybatis.cache.enabled:true}" />
+                </bean>
+            </property>
+        </bean>
     </beans>
   
     <beans profile="dbcp">
@@ -117,6 +132,10 @@
         <bean id="businessDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
             <property name="jndiName" value="java:comp/env/${db.tomcat_resource_name}"/>
         </bean>
+      <bean id="neo4jDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <!-- should come from property file -->
+        <property name="jndiName" value="java:comp/env/jdbc/neo4j/cbioportal"/>
+      </bean>
         <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
             <property name="staticMethod" value="org.mskcc.cbio.portal.dao.JdbcUtil.setDataSource"/>
             <property name="arguments">

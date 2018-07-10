@@ -72,8 +72,9 @@ public class StudyViewController {
         @ApiParam("Type of the clinical data")
         @RequestParam(defaultValue = "SAMPLE") ClinicalDataType clinicalDataType,
         @ApiParam(required = true, value = "Clinical data count filter")
-        @Valid @RequestBody StudyViewFilter studyViewFilter) throws StudyNotFoundException, 
-        MolecularProfileNotFoundException {
+        @Valid @RequestBody StudyViewFilter studyViewFilter,
+        @ApiParam(required = false, value = "useneo4j")
+        @RequestParam(required = false) boolean useneo4j) throws MolecularProfileNotFoundException, StudyNotFoundException {
 
         if (studyViewFilter.getClinicalDataEqualityFilters() != null) {
             studyViewFilter.getClinicalDataEqualityFilters().removeIf(f -> f.getAttributeId().equals(attributeId));
@@ -94,14 +95,16 @@ public class StudyViewController {
         @ApiParam(required = true, value = "Molecular Profile ID e.g. acc_tcga_mutations")
         @PathVariable String molecularProfileId,
         @ApiParam(required = true, value = "Study view filter")
-        @Valid @RequestBody StudyViewFilter studyViewFilter) throws MolecularProfileNotFoundException, StudyNotFoundException {
+        @Valid @RequestBody StudyViewFilter studyViewFilter,
+        @ApiParam(required = false, value = "useneo4j")
+        @RequestParam(required = false) boolean useneo4j) throws MolecularProfileNotFoundException, StudyNotFoundException {
 
         String studyId = molecularProfileService.getMolecularProfile(molecularProfileId).getCancerStudyIdentifier();
         List<String> filteredSampleIds = studyViewFilterApplier.apply(studyId, studyViewFilter);
         List<MutationCountByGene> result = new ArrayList<>();
         if (!filteredSampleIds.isEmpty()) {
             result = mutationService.getSampleCountByEntrezGeneIdsAndSampleIds(molecularProfileId, 
-                filteredSampleIds, null, true);
+                filteredSampleIds, null, true, useneo4j);
             result.sort((a, b) -> b.getCountByEntity() - a.getCountByEntity());
         }
         
@@ -115,7 +118,9 @@ public class StudyViewController {
         @ApiParam(required = true, value = "Molecular Profile ID e.g. acc_tcga_gistic")
         @PathVariable String molecularProfileId,
         @ApiParam(required = true, value = "Study view filter")
-        @Valid @RequestBody StudyViewFilter studyViewFilter) throws MolecularProfileNotFoundException, StudyNotFoundException {
+        @Valid @RequestBody StudyViewFilter studyViewFilter,
+        @ApiParam(required = false, value = "useneo4j")
+        @RequestParam(required = false) boolean useneo4j) throws MolecularProfileNotFoundException, StudyNotFoundException {
 
         String studyId = molecularProfileService.getMolecularProfile(molecularProfileId).getCancerStudyIdentifier();
         List<String> filteredSampleIds = studyViewFilterApplier.apply(studyId, studyViewFilter);
@@ -136,8 +141,9 @@ public class StudyViewController {
         @ApiParam(required = true, value = "Study ID e.g. acc_tcga") 
         @PathVariable String studyId,
         @ApiParam(required = true, value = "Study view filter")
-        @Valid @RequestBody StudyViewFilter studyViewFilter) throws StudyNotFoundException, 
-        MolecularProfileNotFoundException {
+        @Valid @RequestBody StudyViewFilter studyViewFilter,
+        @ApiParam(required = false, value = "useneo4j")
+        @RequestParam(required = false) boolean useneo4j) throws MolecularProfileNotFoundException, StudyNotFoundException {
         
         List<String> sampleIds = studyViewFilterApplier.apply(studyId, studyViewFilter);
         List<String> studyIds = new ArrayList<>();
@@ -152,8 +158,9 @@ public class StudyViewController {
         @ApiParam(required = true, value = "Molecular Profile ID e.g. acc_tcga_mutations")
         @PathVariable String molecularProfileId,
         @ApiParam(required = true, value = "Study view filter")
-        @Valid @RequestBody StudyViewFilter studyViewFilter) throws StudyNotFoundException, 
-        MolecularProfileNotFoundException {
+        @Valid @RequestBody StudyViewFilter studyViewFilter,
+        @ApiParam(required = false, value = "useneo4j")
+        @RequestParam(required = false) boolean useneo4j) throws MolecularProfileNotFoundException, StudyNotFoundException {
         
         String studyId = molecularProfileService.getMolecularProfile(molecularProfileId).getCancerStudyIdentifier();
         List<String> sampleIds = studyViewFilterApplier.apply(studyId, studyViewFilter);

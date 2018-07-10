@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.cbioportal.persistence.neo4j.Neo4jMutationMapper">
+  <sql id="where">
+    <where>
+      type(r) = #{molecularProfileId}
+      <if test="sampleIds != null and !sampleIds.isEmpty()">
+        and s.stable_id in
+        <foreach item="item" collection="sampleIds" open="[" separator="," close="]">
+          #{item}
+        </foreach>
+      </if>
+    </where>
+  </sql>
+
+  <select id="getSampleCountByEntrezGeneIdsAndSampleIds" resultType="org.cbioportal.model.MutationCountByGene">
+    match p=(s:sample)-[r]->(g:gene) <include refid="where"/> return toInteger(g.entrez_gene_id) AS entrezGeneId, g.hugo_gene_symbol AS hugoGeneSymbol, count(p) AS totalCount, count(distinct[s, g]) AS countByEntity
+  </select>
+</mapper>

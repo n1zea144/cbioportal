@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>master</artifactId>
+        <artifactId>persistence</artifactId>
         <groupId>org.mskcc.cbio</groupId>
         <version>1.14.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>service</artifactId>
+    <artifactId>persistence-neo4j</artifactId>
+
+  <properties>
+    <neo4j.jdbc.version>3.3.1</neo4j.jdbc.version>
+  </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.mskcc.cbio</groupId>
-            <artifactId>persistence-mybatis</artifactId>
+            <artifactId>persistence-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mskcc.cbio</groupId>
-            <artifactId>persistence-neo4j</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>${spring.version}</version>
-            <scope>test</scope>
-        </dependency>
+    <dependency>
+      <groupId>org.neo4j</groupId>
+      <artifactId>neo4j-jdbc-driver</artifactId>
+      <version>${neo4j.jdbc.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     </dependencies>
-
 </project>

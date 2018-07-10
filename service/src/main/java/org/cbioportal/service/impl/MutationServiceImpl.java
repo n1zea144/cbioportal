@@ -8,6 +8,7 @@ import org.cbioportal.service.MutationService;
 import org.cbioportal.service.exception.MolecularProfileNotFoundException;
 import org.cbioportal.service.util.ChromosomeCalculator;
 import org.cbioportal.service.util.GeneFrequencyCalculator;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,11 @@ public class MutationServiceImpl implements MutationService {
     private static final String SEQUENCED_LIST_SUFFIX = "_sequenced";
 
     @Autowired
-    private MutationRepository mutationRepository;
+    @Qualifier("mybatisMutationRepository")
+    private MutationRepository mybatisMutationRepository;
+    @Autowired
+    @Qualifier("neo4jMutationRepository")
+    private MutationRepository neo4jMutationRepository;
     @Autowired
     private MolecularProfileService molecularProfileService;
     @Autowired
@@ -38,7 +43,7 @@ public class MutationServiceImpl implements MutationService {
 
         validateMolecularProfile(molecularProfileId);
 
-        List<Mutation> mutationList = mutationRepository.getMutationsInMolecularProfileBySampleListId(molecularProfileId,
+        List<Mutation> mutationList = mybatisMutationRepository.getMutationsInMolecularProfileBySampleListId(molecularProfileId,
             sampleListId, entrezGeneIds, snpOnly, projection, pageSize, pageNumber, sortBy, direction);
 
         mutationList.forEach(mutation -> chromosomeCalculator.setChromosome(mutation.getGene()));
@@ -52,7 +57,7 @@ public class MutationServiceImpl implements MutationService {
 
         validateMolecularProfile(molecularProfileId);
 
-        return mutationRepository.getMetaMutationsInMolecularProfileBySampleListId(molecularProfileId, sampleListId,
+        return mybatisMutationRepository.getMetaMutationsInMolecularProfileBySampleListId(molecularProfileId, sampleListId,
             entrezGeneIds);
     }
 
@@ -62,7 +67,7 @@ public class MutationServiceImpl implements MutationService {
                                                                   String projection, Integer pageSize, 
                                                                   Integer pageNumber, String sortBy, String direction) {
 
-        List<Mutation> mutationList = mutationRepository.getMutationsInMultipleMolecularProfiles(molecularProfileIds,
+        List<Mutation> mutationList = mybatisMutationRepository.getMutationsInMultipleMolecularProfiles(molecularProfileIds,
             sampleIds, entrezGeneIds, projection, pageSize, pageNumber, sortBy, direction);
 
         mutationList.forEach(mutation -> chromosomeCalculator.setChromosome(mutation.getGene()));
@@ -74,7 +79,7 @@ public class MutationServiceImpl implements MutationService {
                                                                     List<String> sampleIds, 
                                                                     List<Integer> entrezGeneIds) {
 
-        return mutationRepository.getMetaMutationsInMultipleMolecularProfiles(molecularProfileIds, sampleIds,
+        return mybatisMutationRepository.getMetaMutationsInMultipleMolecularProfiles(molecularProfileIds, sampleIds,
             entrezGeneIds);
     }
 
@@ -87,7 +92,7 @@ public class MutationServiceImpl implements MutationService {
 
         validateMolecularProfile(molecularProfileId);
 
-        List<Mutation> mutationList = mutationRepository.fetchMutationsInMolecularProfile(molecularProfileId, sampleIds,
+        List<Mutation> mutationList = mybatisMutationRepository.fetchMutationsInMolecularProfile(molecularProfileId, sampleIds,
             entrezGeneIds, snpOnly, projection, pageSize, pageNumber, sortBy, direction);
 
         mutationList.forEach(mutation -> chromosomeCalculator.setChromosome(mutation.getGene()));
@@ -101,21 +106,31 @@ public class MutationServiceImpl implements MutationService {
 
         validateMolecularProfile(molecularProfileId);
 
-        return mutationRepository.fetchMetaMutationsInMolecularProfile(molecularProfileId, sampleIds, entrezGeneIds);
+        return mybatisMutationRepository.fetchMetaMutationsInMolecularProfile(molecularProfileId, sampleIds, entrezGeneIds);
     }
 
     @Override
     public List<MutationCountByGene> getSampleCountByEntrezGeneIdsAndSampleIds(String molecularProfileId,
                                                                                List<String> sampleIds,
                                                                                List<Integer> entrezGeneIds,
-                                                                               boolean includeFrequency)
+                                                                               boolean includeFrequency,
+                                                                               boolean useNeo4j)
         throws MolecularProfileNotFoundException {
 
         MolecularProfile molecularProfile = validateMolecularProfile(molecularProfileId);
 
-        List<MutationCountByGene> result = mutationRepository.getSampleCountByEntrezGeneIdsAndSampleIds(
-            molecularProfileId, sampleIds, entrezGeneIds);
-        
+        List<MutationCountByGene> result = null;
+        if (useNeo4j) {
+            System.out.println("**** using neo4j ****");
+            result = neo4jMutationRepository.getSampleCountByEntrezGeneIdsAndSampleIds(
+                molecularProfileId, sampleIds, entrezGeneIds);
+        }
+        else {
+            System.out.println("**** using mybatis ****");
+            result = mybatisMutationRepository.getSampleCountByEntrezGeneIdsAndSampleIds(
+                molecularProfileId, sampleIds, entrezGeneIds);
+        }
+
         if (includeFrequency) {
             geneFrequencyCalculator.calculate(molecularProfile, sampleIds, result, SEQUENCED_LIST_SUFFIX);
         }
@@ -131,7 +146,7 @@ public class MutationServiceImpl implements MutationService {
 
         validateMolecularProfile(molecularProfileId);
 
-        return mutationRepository.getPatientCountByEntrezGeneIdsAndSampleIds(molecularProfileId, patientIds, 
+        return mybatisMutationRepository.getPatientCountByEntrezGeneIdsAndSampleIds(molecularProfileId, patientIds, 
             entrezGeneIds);
     }
 
@@ -142,7 +157,7 @@ public class MutationServiceImpl implements MutationService {
 
         validateMolecularProfile(molecularProfileId);
 
-        return mutationRepository.getMutationCountsInMolecularProfileBySampleListId(molecularProfileId, sampleListId);
+        return mybatisMutationRepository.getMutationCountsInMolecularProfileBySampleListId(molecularProfileId, sampleListId);
     }
 
     @Override
@@ -151,7 +166,7 @@ public class MutationServiceImpl implements MutationService {
 
         validateMolecularProfile(molecularProfileId);
 
-        return mutationRepository.fetchMutationCountsInMolecularProfile(molecularProfileId, sampleIds);
+        return mybatisMutationRepository.fetchMutationCountsInMolecularProfile(molecularProfileId, sampleIds);
     }
 
     @Override
@@ -162,7 +177,7 @@ public class MutationServiceImpl implements MutationService {
         List<MutationCountByPosition> mutationCountByPositionList = new ArrayList<>();
         for (int i = 0; i < entrezGeneIds.size(); i++) {
 
-            MutationCountByPosition mutationCountByPosition = mutationRepository.getMutationCountByPosition(
+            MutationCountByPosition mutationCountByPosition = mybatisMutationRepository.getMutationCountByPosition(
                 entrezGeneIds.get(i), proteinPosStarts.get(i), proteinPosEnds.get(i));
             mutationCountByPositionList.add(mutationCountByPosition);
         }
