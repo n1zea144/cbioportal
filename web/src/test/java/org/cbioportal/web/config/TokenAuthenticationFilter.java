@@ -30,14 +30,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.cbioportal.security.spring.authentication.token;
+package org.cbioportal.web.config;
 
 import org.cbioportal.service.DataAccessTokenService;
 import org.cbioportal.service.DataAccessTokenServiceFactory;
 import org.cbioportal.service.impl.UnauthDataAccessTokenServiceImpl;
 
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
-
+import java.util.Collections;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -65,26 +65,6 @@ import org.springframework.util.StringUtils;
 @Component
 public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-    private final List<String> SUPPORTED_DAT_METHODS = Arrays.asList("uuid", "jwt");
-    @Value("${dat.method:none}") // default value is none
-    private String datMethod;
-
-    @Autowired
-    private DataAccessTokenServiceFactory dataAccessTokenServiceFactory;
-
-    private DataAccessTokenService tokenService;
-    @PostConstruct
-    public void postConstruct() {
-        if (datMethod == null || !SUPPORTED_DAT_METHODS.contains(datMethod)) {
-            this.tokenService = new UnauthDataAccessTokenServiceImpl();
-        }
-        else {
-            this.tokenService = this.dataAccessTokenServiceFactory.getDataAccessTokenService(this.datMethod);
-        }
-    }
-
-    private static final String BEARER = "Bearer";
-
     private static final Log LOG = LogFactory.getLog(TokenAuthenticationFilter.class);
 
     public TokenAuthenticationFilter() {
@@ -98,7 +78,7 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
         String param = request.getHeader(AUTHORIZATION);
         if (param == null) {
             LOG.debug("attemptAuthentication(), authorization header is null, continue on to other security filters");
-            return false;
+            return true;
         }
         return true;
     }
@@ -107,19 +87,9 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
     public Authentication attemptAuthentication (
         final HttpServletRequest request,
         final HttpServletResponse response) {
-
-        String token = extractHeaderToken(request);
-
-        if (token == null || !tokenService.isValid(token)) {
-            // TODO should this be a custom subclass of AuthenticationException?
-            LOG.error("invalid token = " + token);
-            throw new BadCredentialsException("Invalid token");
-        }
-
-        // when DaoAuthenticationProvider does authentication on user returned by PortalUserDetailsService
-        // which has password "unused", this password won't match, and then there is a BadCredentials exception thrown
-        // this is a good way to catch that the wrong authetication provider is being used
-        Authentication auth = new UsernamePasswordAuthenticationToken(tokenService.getUsername(token), "does not match unused");
+        
+        System.out.println("\n\n>>> Attempting authentication in the tokenAuthenticationFilter");
+        Authentication auth = new UsernamePasswordAuthenticationToken("MOCK_USER", "MOCK_PASSWORD");
         return getAuthenticationManager().authenticate(auth);
     }
 
@@ -129,23 +99,8 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
         final HttpServletResponse response,
         final FilterChain chain,
         final Authentication authResult) throws IOException, ServletException {
+        System.out.println("\n\n\n successful authentication");
         super.successfulAuthentication(request, response, chain, authResult);
         chain.doFilter(request, response);
-    }
-
-    /**
-     * Extract the bearer token from a header.
-     * 
-     * @param request
-     * @return The token, or null if no authorization header was supplied
-     */
-    protected String extractHeaderToken(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader(AUTHORIZATION);
-        if (!StringUtils.isEmpty(authorizationHeader)) {
-            if ((authorizationHeader.toLowerCase().startsWith(BEARER.toLowerCase()))) {
-                return authorizationHeader.substring(BEARER.length()).trim();
-            }
-        }
-        return null;
     }
 }

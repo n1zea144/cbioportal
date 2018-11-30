@@ -87,6 +87,10 @@ public class DataAccessTokenController {
     public ResponseEntity<DataAccessToken> createDataAccessToken(Authentication authentication,
                                     @RequestParam(required = false) Boolean allowRevocationOfOtherTokens) throws HttpClientErrorException {
         DataAccessToken createdToken;
+        System.out.println("\n\n\n\n\n>>>> Inside the controller \n\n\n\n\n ");
+        if (authentication == null) {
+            System.out.println("\n\n\n\n\n>>>> AUTHENTICATION IS NULL \n\n\n\n\n ");
+        }
         if (allowRevocationOfOtherTokens != null) {
             createdToken = tokenService.createDataAccessToken(getAuthenticatedUser(authentication), allowRevocationOfOtherTokens);
         }

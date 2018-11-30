@@ -46,7 +46,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.cbioportal.security.spring;
+package org.cbioportal.web.config;
 
 import java.io.IOException;
 import java.net.URI;
@@ -84,9 +84,8 @@ class PortalSavedRequestAwareAuthenticationSuccessHandler extends SimpleUrlAuthe
     public void onAuthenticationSuccess(HttpServletRequest request,
             HttpServletResponse response, Authentication authentication)
             throws ServletException, IOException {
-        System.out.println("I'm in here now, in the other handler");
         SavedRequest savedRequest = requestCache.getRequest(request, response);
-
+        System.out.println(">>> In the PortalSavedRequest Handler thingy");
         if (savedRequest == null) {
             super.onAuthenticationSuccess(request, response, authentication);
 
