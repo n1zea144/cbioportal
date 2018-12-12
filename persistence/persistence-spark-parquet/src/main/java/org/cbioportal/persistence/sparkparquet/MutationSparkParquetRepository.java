@@ -36,7 +36,7 @@ public class MutationSparkParquetRepository implements MutationRepository {
             System.out.println("!!!!! Initializing spark context Start !!!!!");
             //spark = SparkSession.builder().appName("cBioPortalSpark").master("local")
             spark = SparkSession.builder().appName("cBioPortalSpark").master("spark://dashi-dev.cbio.mskcc.org:7077")
-                .config("spark.sql.warehouse.dir", "/data/tmp").config("spark.yarn.submit.waitAppCompletion","false").getOrCreate();
+                .config("spark.sql.warehouse.dir", "/data/tmp").getOrCreate();
             System.out.println("!!!!! Initializing spark context End !!!!!");
             if (spark == null) {
                 throw new RuntimeException("!!!!! Cannot initialize spark context. !!!!!");
