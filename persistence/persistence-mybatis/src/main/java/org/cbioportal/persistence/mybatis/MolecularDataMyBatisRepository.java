@@ -1,5 +1,6 @@
 package org.cbioportal.persistence.mybatis;
 
+import org.cbioportal.model.GeneMolecularData;
 import org.cbioportal.model.GeneMolecularAlteration;
 import org.cbioportal.model.GenesetMolecularAlteration;
 import org.cbioportal.persistence.MolecularDataRepository;
@@ -27,10 +28,10 @@ public class MolecularDataMyBatisRepository implements MolecularDataRepository {
     }
 
     @Override
-    public List<GeneMolecularAlteration> getGeneMolecularAlterations(String molecularProfileId, 
-                                                                     List<Integer> entrezGeneIds, String projection) {
+    public List<GeneMolecularData> getGeneMolecularAlterations(String molecularProfileId, List<Integer> sampleIds,
+                                                               List<Integer> entrezGeneIds, String projection) {
 
-        return molecularDataMapper.getGeneMolecularAlterations(molecularProfileId, entrezGeneIds, projection);
+        return molecularDataMapper.getGeneMolecularAlterations(molecularProfileId, sampleIds, entrezGeneIds, projection);
     }
 
     @Override

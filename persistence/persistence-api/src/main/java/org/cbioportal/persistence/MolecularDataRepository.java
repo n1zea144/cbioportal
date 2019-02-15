@@ -2,6 +2,7 @@ package org.cbioportal.persistence;
 
 import java.util.List;
 
+import org.cbioportal.model.GeneMolecularData;
 import org.cbioportal.model.GenesetMolecularAlteration;
 import org.cbioportal.model.GeneMolecularAlteration;
 
@@ -11,8 +12,8 @@ public interface MolecularDataRepository {
 
     List<String> getCommaSeparatedSampleIdsOfMolecularProfiles(List<String> molecularProfileIds);
 
-    List<GeneMolecularAlteration> getGeneMolecularAlterations(String molecularProfileId, List<Integer> entrezGeneIds,
-                                                              String projection);
+    List<GeneMolecularData> getGeneMolecularAlterations(String molecularProfileId, List<Integer> sampleIds,
+                                                        List<Integer> entrezGeneIds, String projection);
 
     List<GeneMolecularAlteration> getGeneMolecularAlterationsInMultipleMolecularProfiles(List<String> molecularProfileIds, 
                                                                                          List<Integer> entrezGeneIds,
