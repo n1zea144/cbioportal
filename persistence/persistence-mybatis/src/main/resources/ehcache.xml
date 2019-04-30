@@ -1,0 +1,77 @@
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="ehcache.xsd"
+         updateCheck="false" monitoring="autodetect"
+         dynamicConfig="true" name="cbioportal-ehcache">
+
+  <diskStore path="${mybatis.cache.path}"/>
+  <sizeOfPolicy maxDepth="10000000" maxDepthExceededBehavior="continue"/>
+  
+  <!-- <defaultCache -->
+  <!--     statistics="${mybatis.cache.statistics}"> -->
+  <!--     maxBytesLocalHeap="${mybatis.cache.default.heapsize}" -->
+  <!--     maxBytesLocalDisk="${mybatis.cache.default.disksize}"> -->
+  <!--     <persistence strategy="localTempSwap"/> -->
+  <!--     <sizeOfPolicy maxDepth="1000000" maxDepthExceededBehavior="continue"/> -->
+  <!-- </defaultCache> -->
+
+  <cache name="org.cbioportal.persistence.mybatis.GeneMapper"
+      statistics="${mybatis.cache.statistics}"
+      maxBytesLocalHeap="${mybatis.cache.GeneMapper.heapsize}"/>
+
+  <cache name="org.cbioportal.persistence.mybatis.MutationMapper"
+      statistics="${mybatis.cache.statistics}"
+      maxBytesLocalHeap="${mybatis.cache.MutationMapper.heapsize}"
+      maxBytesLocalDisk="${mybatis.cache.MutationMapper.disksize}">
+      <persistence strategy="localTempSwap"/>
+  </cache>
+
+  <cache name="org.cbioportal.persistence.mybatis.ClinicalDataMapper"
+      statistics="${mybatis.cache.statistics}"
+      maxBytesLocalHeap="${mybatis.cache.ClinicalDataMapper.heapsize}"
+      maxBytesLocalDisk="${mybatis.cache.ClinicalDataMapper.disksize}">
+    <persistence strategy="localTempSwap"/>
+  </cache>
+
+  <cache name="org.cbioportal.persistence.mybatis.DiscreteCopyNumberMapper"
+      statistics="${mybatis.cache.statistics}"
+      maxBytesLocalHeap="${mybatis.cache.DiscreteCopyNumberMapper.heapsize}"
+      maxBytesLocalDisk="${mybatis.cache.DiscreteCopyNumberMapper.disksize}">
+    <persistence strategy="localTempSwap"/>
+  </cache>
+
+  <cache name="org.cbioportal.persistence.mybatis.SampleMapper"
+      statistics="${mybatis.cache.statistics}"
+      maxBytesLocalHeap="${mybatis.cache.SampleMapper.heapsize}"
+      maxBytesLocalDisk="${mybatis.cache.SampleMapper.disksize}">
+    <persistence strategy="localTempSwap"/>
+  </cache>
+
+  <cache name="org.cbioportal.persistence.mybatis.PatientMapper"
+      statistics="${mybatis.cache.statistics}"
+      maxBytesLocalHeap="${mybatis.cache.PatientMapper.heapsize}"
+      maxBytesLocalDisk="${mybatis.cache.PatientMapper.disksize}">
+    <persistence strategy="localTempSwap"/>
+  </cache>
+
+  <cache name="org.cbioportal.persistence.mybatis.GenePanelMapper"
+      statistics="${mybatis.cache.statistics}"
+      maxBytesLocalHeap="${mybatis.cache.GenePanelMapper.heapsize}"
+      maxBytesLocalDisk="${mybatis.cache.GenePanelMapper.disksize}">
+    <persistence strategy="localTempSwap"/>
+  </cache>
+
+  <cache name="org.cbioportal.persistence.mybatis.SignificantlyMutatedGeneMapper"
+      statistics="${mybatis.cache.statistics}"
+      maxBytesLocalHeap="${mybatis.cache.SignificantlyMutatedGeneMapper.heapsize}"
+      maxBytesLocalDisk="${mybatis.cache.SignificantlyMutatedGeneMapper.disksize}">
+    <persistence strategy="localTempSwap"/>
+  </cache>
+
+  <cache name="org.cbioportal.persistence.mybatis.SignificantCopyNumberRegionMapper"
+      statistics="${mybatis.cache.statistics}"
+      maxBytesLocalHeap="${mybatis.cache.SignificantCopyNumberRegionMapper.heapsize}"
+      maxBytesLocalDisk="${mybatis.cache.SignificantCopyNumberRegionMapper.disksize}">
+    <persistence strategy="localTempSwap"/>
+  </cache>
+    
+</ehcache>
